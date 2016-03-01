@@ -1,0 +1,436 @@
+﻿# selenium python unittest框架搭建
+
+标签（空格分隔）： selenium  python  unittest
+
+---
+
+unittest大概测试框架：
+
+    /selenium_python/test_case/baidu.py -----测试用例
+    			/test_case/youdao.py -----测试用例
+    			/test_case/webcloud.py -----私有云用例
+    			/test_case/__init__.py
+    			/test_case/public/login.py -----登录模块
+    			/test_case/public/quit.py -----退出模块
+    			/test_case/public/__init__.py
+    			/data/userinfo.csv -----用户数据参数化文件
+    			/report/now_time_result.html -----HTML 测试报告
+                /all_tests.py ----执行用例文件
+
+python内部自带了一个单元测试的模块，pyUnit也就是我们说的：unittest
+先介绍下unittest的基本使用方法：
+1.import unittest
+2.定义一个继承自unittest.TestCase的测试用例类
+3.定义setUp和tearDown，在每个测试用例前后做一些辅助工作。
+4.定义测试用例，名字以test开头。
+5.一个测试用例应该只测试一个方面，测试目的和测试内容应很明确。主要是调用assertEqual、assertRaises等断言方法判断程序执行结果和预期值是否相符。
+6.调用unittest.main()启动测试
+7.如果测试未通过，会输出相应的错误提示。如果测试全部通过则不显示任何东西，这时可以添加-v参数显示详细信息。
+
+下面是unittest模块的常用方法：
+
+    assertEqual(a, b)     a == b      
+    assertNotEqual(a, b)     a != b      
+    assertTrue(x)     bool(x) is True      
+    assertFalse(x)     bool(x) is False      
+    assertIs(a, b)     a is b     2.7
+    assertIsNot(a, b)     a is not b     2.7
+    assertIsNone(x)     x is None     2.7
+    assertIsNotNone(x)     x is not None     2.7
+    assertIn(a, b)     a in b     2.7
+    assertNotIn(a, b)     a not in b     2.7
+    assertIsInstance(a, b)     isinstance(a, b)     2.7
+    assertNotIsInstance(a, b)     not isinstance(a, b)     2.7
+
+下面看具体的代码应用：
+首先写了一个简单应用：
+
+    import random
+    import unittest
+    
+    class TestSequenceFunctions(unittest.TestCase):
+    
+       def setUp(self):
+           self.seq = range(10)
+    
+       def test_shuffle(self):
+           # make sure the shuffled sequence does not lose any elements
+           random.shuffle(self.seq)
+           self.seq.sort()
+           self.assertEqual(self.seq, range(10))
+    
+           # should raise an exception for an immutable sequence
+           self.assertRaises(TypeError, random.shuffle, (1,2,3))
+    
+       def test_choice(self):
+           element = random.choice(self.seq)
+           self.assertTrue(element in self.seq)
+    
+       def test_error(self):
+              element = random.choice(self.seq)
+              self.assertTrue(element not in self.seq)
+    
+    
+    if __name__ == '__main__':
+       unittest.main()
+
+下面是写了一个简单的应用，测试下面4个网址返回的状态码是否是200。
+
+    import unittest
+    import urllib
+    
+    class TestUrlHttpcode(unittest.TestCase):
+       def setUp(self):
+           urlinfo = ['http://www.baidu.com','http://www.163.com','http://www.sohu.com','http://www.cnpythoner.com']
+           self.checkurl = urlinfo
+    
+       def test_ok(self):
+           for m in self.checkurl:
+               httpcode = urllib.urlopen(m).getcode()
+               self.assertEqual(httpcode,200)
+    
+    if __name__ == '__main__':
+       unittest.main()
+
+如果有的网址打不开，返回404的话,测试则会报错
+ 如果有的网址打不开，返回404的话,测试则会报错
+
+----------------------------------------------------------------------
+Ran 1 test in 1.425s
+
+FAILED (errors=1)
+ 
+也有其他的unittest方法，用于执行更具体的检查，如：
+
+    Method     Checks that     New in
+    assertAlmostEqual(a, b)     round(a-b, 7) == 0      
+    assertNotAlmostEqual(a, b)     round(a-b, 7) != 0      
+    assertGreater(a, b)     a > b     2.7
+    assertGreaterEqual(a, b)     a >= b     2.7
+    assertLess(a, b)     a < b     2.7
+    assertLessEqual(a, b)     a <= b     2.7
+    assertRegexpMatches(s, re)     regex.search(s)     2.7
+    assertNotRegexpMatches(s, re)     not regex.search(s)     2.7
+    assertItemsEqual(a, b)     sorted(a) == sorted(b) and works with unhashable objs     2.7
+    assertDictContainsSubset(a, b)     all the key/value pairs in a exist in b     2.7
+    assertMultiLineEqual(a, b)     strings     2.7
+    assertSequenceEqual(a, b)     sequences     2.7
+    assertListEqual(a, b)     lists     2.7
+    assertTupleEqual(a, b)     tuples     2.7
+    assertSetEqual(a, b)     sets or frozensets     2.7
+    assertDictEqual(a, b)     dicts     2.7
+    assertMultiLineEqual(a, b)     strings     2.7
+    assertSequenceEqual(a, b)     sequences     2.7
+    assertListEqual(a, b)     lists     2.7
+    assertTupleEqual(a, b)     tuples     2.7
+    assertSetEqual(a, b)     sets or frozensets     2.7
+    assertDictEqual(a, b)     dicts     2.7
+
+你可以用unittest模块的更多方法来做自己的单元测试
+1. 登录知乎实现
+
+import time
+import requests
+from bs4 import BeautifulSoup
+
+def kill_captcha(data):
+    with open('captcha.png', 'wb') as fp:
+        fp.write(data)
+    return input('captcha:')
+
+
+def login(username, password, oncaptcha):
+    session = requests.session()
+
+    _xsrf = BeautifulSoup(session.get('https://www.zhihu.com/#signin').content).find('input', attrs={'name': '_xsrf'})[
+        'value']
+    captcha_content = session.get('http://www.zhihu.com/captcha.gif?r=%d' % (time.time() * 1000)).content
+    data = {
+        '_xsrf': _xsrf,
+        'email': username,
+        'password': password,
+        'remember_me': 'true',
+        'captcha': oncaptcha(captcha_content)
+    }
+    resp = session.post('http://www.zhihu.com/login/email', data).content
+    # assert '\u767b\u9646\u6210\u529f' in resp
+    return session
+
+
+if __name__ == '__main__':
+    session = login('user', 'passwd', kill_captcha)
+    print(BeautifulSoup(session.get("https://www.zhihu.com").content).find('span', class_='name').getText())
+resp = requests.get('https://www.zhihu.com')
+print(resp.status_code)
+
+	
+2. 实现自动化登录
+	
+
+    import time
+    	from selenium import webdriver
+    	
+    	driver = webdriver.Chrome()
+    	with open("log.txt", 'r') as f:
+    	        for values in f.readlines():
+    	            if True:
+    	                user = str(values).strip().split()[0]
+    	                passwd = values.strip().split()[1]
+    	                print "浏览器最大化！"
+    	                driver.maximize_window()
+    	                driver.get('http://172.16.117.225:7065/ent-pr-war/login.jsp')
+    	                # driver.find_element_by_id("username").clear()
+    	                driver.find_element_by_id('username').send_keys(user)
+    	                # driver.find_element_by_id('password').clear()
+    	                driver.find_element_by_id('password').send_keys(passwd)
+    	                driver.find_element_by_class_name('back_login_button_font').click()
+    	                driver.quit
+    	                break
+    	            else:
+    	                continue
+    	# 访问新闻网页
+    	# second_url = 'http://news.baidu.com'
+    	# print('noew access %s'% second_url)
+    	# driver.get(second_url)
+    	# time.sleep(1)
+    	
+	3. Unittest 使用
+		a. 在selenium的IDE中录制完成，导处unittest python代码
+		b. 组织测试框架结构，组织测试用例
+		
+		c.  在test_case文件夹下创建baidu.py
+	
+
+     coding=utf-8
+    	from selenium import webdriver
+    	from selenium.webdriver.common.by import By
+    	from selenium.webdriver.common.keys import Keys
+    	from selenium.webdriver.support.ui import Select
+    	from selenium.common.exceptions import NoSuchElementException
+    	import unittest, time, re
+    	
+    	
+    	class Baidu(unittest.TestCase):
+    	    def setUp(self):
+    	        self.driver = webdriver.Chrome()
+    	        self.driver.implicitly_wait(3)
+    	        self.base_url = "http://www.baidu.com"
+    	        self.verificationErrors = []
+    	        self.accept_next_alert = True
+    	
+    	    # 百度搜索用例
+    	    def test_baidu_search(self):
+    	        driver = self.driver
+    	        driver.get(self.base_url + '/')
+    	        driver.find_element_by_id("kw").send_keys("selenium webdriver")
+    	        driver.find_element_by_id("su").click()
+    	        time.sleep(2)
+    	        driver.close()
+    	
+    	    # 百度设置用例
+    	    def test_baidu_set(self):
+    	        driver = self.driver
+    	
+    	        # 进入搜索设置页
+    	        driver.get(self.base_url + "/gaoji/preferences.html")
+    	
+    	        # 设置每页搜索结果为100条
+    	        m = driver.find_element_by_name("NR")
+    	        m.find_element_by_xpath("//option[@value='50']").click()
+    	        time.sleep(2)
+    	
+    	        # 保存设置的信息
+    	        driver.find_element_by_xpath("//input[@value='保存设置']").click()
+    	        time.sleep(2)
+    	        driver.switch_to_alert().accept()
+    	
+    	    def tearDown(self):
+    	        self.driver.quit()
+    	        self.assertEqual([], self.verificationErrors)
+    	
+    	
+    	if __name__ == '__main__':
+    	    unittest.main()
+    
+    	 d.  编写test_case.py文件读取test_case文件夹下的文件：
+    	 
+    	# coding:utf-8
+    	import os
+    	# 列出某个文件夹下的所有case，这里用的是python
+    	#  所在py文件运行一次后会生成一个pyc的副本
+    	# case = os.listdir(r'C:\Users\PCPC\pyobject\test_case\test_case')
+    	# 打开路径使用os.listdir(r'path')方式也可以
+    	caselist = os.listdir(r'C:\\Users\\PCPC\\pyobject\\test_case\\test_case')
+    	for a in caselist:
+    	    s = a.split('.')[1]  # 选取后缀名为py的文件
+    	    if s == 'py':
+    	        # 此处执行dos命令并将结果保存到log.txt
+    	        os.system('C:\\Users\\PCPC\\pyobject\\test\\%s 1>>log.txt 2>&1' % a)
+	
+
+    python知识补充：
+    	# python的os模块可以用来操作本地文件，通过os.listdir()函数获得指定目录下的类容；下面通过下例子单独理解下这段程序的匹配用法
+    	# x = 'testing.py' 定义变量为一个字符串
+    	# s = x.split(',')[1]
+
+ 已，为分割字符串，被分割的字符串变成['testing','py']数组，因为数组是从0开始计算的，所以[1]去的就是py
+	4. 引入测试报告与结构优化
+	我想在开始本章的学习之前先来先来回顾一下目前的测试结构，因为本章节会对结构做一个改进，以
+	帮助我们更好的实施自动化测试。
+	/selenium_python/test_case/baidu.py -----测试用例
+				/test_case/webcloud.py -----测试用例
+				/test_case/login.py -----登录模块
+				/test_case/quit.py -----退出模块
+				/data/userinfo.csv -----用户数据参数化文件
+				/test_case.py ----执行所有用例
+				/log.txt ----用例执行结果文件
+	5. 引入HTMLTestRunner测试报告
+	在使用pycharm时，引入测试模板执行的时候要使用ALT+SHIFT+F10，否则测试报告不能输出
+	unittest 单元测试框架解析中有过讲解，TestSuite()可以被看作一个容器（测试套件），
+	通过addTest 方法我们可罗列具体所要执行的测试用例。当然了，如果使用unittest.main() 的话默认会执
+	行所有以test 开头的测试用例。
+
+
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.common.keys import Keys
+    from selenium.webdriver.support.ui import Select
+    from selenium.common.exceptions import NoSuchElementException
+    import unittest, time
+    import HTMLTestRunner
+    
+    
+    class Baidu(unittest.TestCase):
+        def setUp(self):
+            self.driver = webdriver.Chrome()
+            self.driver.implicitly_wait(3)
+            self.base_url = "http://www.baidu.com"
+            self.verificationErrors = []
+            self.accept_next_alert = True
+    
+        # 百度搜索用例
+        def test_baidu_search(self):
+            driver = self.driver
+            driver.get(self.base_url + '/')
+            driver.find_element_by_id("kw").send_keys("selenium webdriver")
+            driver.find_element_by_id("su").click()
+            time.sleep(2)
+            driver.close()
+    
+        # 百度设置用例
+        def test_baidu_set(self):
+            driver = self.driver
+    
+            # 进入搜索设置页
+            driver.get(self.base_url + "/gaoji/preferences.html")
+    
+            # 设置每页搜索结果为100条
+            m = driver.find_element_by_name("NR")
+            m.find_element_by_xpath("//option[@value='50']").click()
+            time.sleep(2)
+    
+            # 保存设置的信息
+            driver.find_element_by_xpath("//input[@value='保存设置']").click()
+            time.sleep(2)
+            driver.switch_to_alert().accept()
+    
+        def tearDown(self):
+            self.driver.quit()
+            self.assertEqual([], self.verificationErrors)
+    
+    
+    if __name__ == '__main__':
+        # 定一个报告存放路径，支持相对路径
+        filename = 'E:\\result.html'
+        fp = file(filename, 'wb')
+        # 定义一个单元测试容器
+        testunit = unittest.TestSuite()
+    
+        # 将测试用例加入到测试容器中
+        testunit.addTest(Baidu("test_baidu_search"))
+        testunit.addTest(Baidu("test_baidu_set"))
+    
+    
+    
+        # 定义测试报告
+        runner = HTMLTestRunner.HTMLTestRunner(
+                stream=fp,
+                title=u'搜索测试报告',
+                description=u'用例执行情况：')
+        # 运行测试用例
+        runner.run(testunit)
+	
+	6. 测试套件TestSuite
+	
+	测试套件组织的用例结构
+	这里与前面稍有不同的是用到了unittest 的makeSuite：
+	makeSuite 用于生产testsuite 对象的实例，把所有的测试用例组装成TestSuite，最后把TestSuite 传给
+	TestRunner 进行执行。
+	time.time() 获取当前时间戳
+	time.localtime() 当前时间的struct_time 形式
+	time.ctime() 当前时间的字符串形式
+	time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+	
+	    # 取前面时间
+	now = time.strftime("%Y-%m-%M-%H_%M_%S",time.localtime(time.time()))
+	    # 把当前时间加到报告中
+	filename = "D:\\selenium_python\\report\\"+now+'result.html'
+	
+	
+	测试代码的结构
+	
+	导入包的方法
+	第一种
+	import unittest
+	import HTMLTestRunner
+	import time
+	
+	from test_case import youdao
+	from test_case import baidutest
+	只需要导入就可以
+	
+	另一种方法
+	在要导入的包目录下创建__init__.py文件，在文件中写入
+	Import baidutest
+	Import youdao
+	
+	在all_tests文件中写入
+	from test_case import * 这样就可以了
+	
+	tasklist查看进程pid
+	Taskkill /F /IM chromedirver.exe 杀掉进程
+	
+	使用unittest中的TestLoader函数来判断是否为测试用例文件
+	TestLoader测试用例加载器，其包括多个加载测试的方法，返回一个测试套件
+	discover(start_dir，pattern='test*.py'，top_level_dir=None)
+
+	找到指定目录下所有测试模块，并可递归查到子目录下的测试模块，只有匹配到文件名才能被加载。
+	如果启动的不是顶层目录，那么顶层目录必须要单独指定。
+	start_dir ：要测试的模块名或测试用例目录
+	pattern='test*.py' ：表示用例文件名的匹配原则。星号“*”表示任意多个字符。
+	这里需要说明一个测试用例的创建规则：我们在实际的测试用开发中用例的创建也应该分两个阶段，
+	用例刚在目录下被创建，可命名为aa.py ，当用例创建完成并且运行稳定后再添加到测试套件中。那么可
+	以将aa.py 重新命名为start_aa.py ，那么测试套件在运行时只识别并运行start 开头的.py 文件。
+	理解了这个规则，我们就可以按照一个约定来命名自己用例文件名。这里我们将baidu.py 、youdao.py
+	和webcoud.py 三个文件重命名为以start_开头。
+	top_level_dir=None：测试模块的顶层目录。如果没顶层目录（也就是说测试用例不是放在多级目录
+	中），默认为None。
+	理解了discover()方法的结构，下面看如何应用到实际项目中，打开all_tests.py 文件：
+	提示：在使用discover时候，如果报错ModuleImportFailure object is not iterable时，需要检查
+	 from test_case import *或者测试用例目录下__init__是否正确！
+	查看生成的测试报告：
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
