@@ -1,24 +1,32 @@
-## selenium python unittest¿ò¼Ü
+ï»¿
 
 
-### ÕûÌåÄ¿Â¼½á¹¹
-/selenium_python/test_case/baidu.py -----²âÊÔÓÃÀı
-					/test_case/youdao.py -----²âÊÔÓÃÀı
-					/test_case/webcloud.py -----Ë½ÓĞÔÆÓÃÀı
-					/test_case/__init__.py
-					/test_case/public/login.py -----µÇÂ¼Ä£¿é
-					/test_case/public/quit.py -----ÍË³öÄ£¿é
-					/test_case/public/__init__.py
-					/data/userinfo.csv -----ÓÃ»§Êı¾İ²ÎÊı»¯ÎÄ¼ş
-					/report/now_time_result.html -----HTML ²âÊÔ±¨¸æ
-					/all_tests.py ----Ö´ĞĞÓÃÀıÎÄ¼ş
+
+---
+
+ **selenium python unittestæ¡†æ¶**
+
+
+### æ•´ä½“ç›®å½•ç»“æ„
+
+    /selenium_python/test_case/baidu.py -----æµ‹è¯•ç”¨ä¾‹
+    				/test_case/youdao.py -----æµ‹è¯•ç”¨ä¾‹
+    				/test_case/webcloud.py -----ç§æœ‰äº‘ç”¨ä¾‹
+    				/test_case/__init__.py
+    				/test_case/public/login.py -----ç™»å½•æ¨¡å—
+    				/test_case/public/quit.py -----é€€å‡ºæ¨¡å—
+    				/test_case/public/__init__.py
+    				/data/userinfo.csv -----ç”¨æˆ·æ•°æ®å‚æ•°åŒ–æ–‡ä»¶
+    				/report/now_time_result.html -----HTML æµ‹è¯•æŠ¥å‘Š
+    				/all_tests.py ----æ‰§è¡Œç”¨ä¾‹æ–‡ä»¶
 					
-### Ê¹ÓÃ£º
-ÔÚtest_caseÄ¿Â¼ÏÂ´´½¨²âÊÔÓÃÀı£¬Ö´ĞĞall_tests¼´¿É
+### ä½¿ç”¨ï¼š
+
+åœ¨test_caseç›®å½•ä¸‹åˆ›å»ºæµ‹è¯•ç”¨ä¾‹ï¼Œæ‰§è¡Œall_testså³å¯
 
 
-pythonÄÚ²¿×Ô´øÁËÒ»¸öµ¥Ôª²âÊÔµÄÄ£¿é£¬pyUnitÒ²¾ÍÊÇÎÒÃÇËµµÄ£ºunittest
-ÏÂÃæÊÇunittestÄ£¿éµÄ³£ÓÃ·½·¨£º
+pythonå†…éƒ¨è‡ªå¸¦äº†ä¸€ä¸ªå•å…ƒæµ‹è¯•çš„æ¨¡å—ï¼ŒpyUnitä¹Ÿå°±æ˜¯æˆ‘ä»¬è¯´çš„ï¼šunittest
+ä¸‹é¢æ˜¯unittestæ¨¡å—çš„å¸¸ç”¨æ–¹æ³•ï¼š
 
     assertEqual(a, b)     a == b      
     assertNotEqual(a, b)     a != b      
@@ -33,9 +41,10 @@ pythonÄÚ²¿×Ô´øÁËÒ»¸öµ¥Ôª²âÊÔµÄÄ£¿é£¬pyUnitÒ²¾ÍÊÇÎÒÃÇËµµÄ£ºunittest
     assertIsInstance(a, b)     isinstance(a, b)     2.7
     assertNotIsInstance(a, b)     not isinstance(a, b)     2.7
 	
-Ò²ÓĞÆäËûµÄunittest·½·¨£¬ÓÃÓÚÖ´ĞĞ¸ü¾ßÌåµÄ¼ì²é£¬Èç£º
+ä¹Ÿæœ‰å…¶ä»–çš„unittestæ–¹æ³•ï¼Œç”¨äºæ‰§è¡Œæ›´å…·ä½“çš„æ£€æŸ¥ï¼Œå¦‚ï¼š
 
-   Method     Checks that     New in
+   
+
     assertAlmostEqual(a, b)     round(a-b, 7) == 0      
     assertNotAlmostEqual(a, b)     round(a-b, 7) != 0      
     assertGreater(a, b)     a > b     2.7
@@ -58,3 +67,7 @@ pythonÄÚ²¿×Ô´øÁËÒ»¸öµ¥Ôª²âÊÔµÄÄ£¿é£¬pyUnitÒ²¾ÍÊÇÎÒÃÇËµµÄ£ºunittest
     assertTupleEqual(a, b)     tuples     2.7
     assertSetEqual(a, b)     sets or frozensets     2.7
     assertDictEqual(a, b)     dicts     2.7
+
+
+
+
