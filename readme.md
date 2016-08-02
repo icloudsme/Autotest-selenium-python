@@ -1,7 +1,7 @@
 
 
 =========================
-|build-status| |Autotest-selenium-python|
+Autotest-selenium-python|Build Status| |Build Status2|
 
 ---
 
