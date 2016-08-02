@@ -1,5 +1,7 @@
 
-|build-status| |docs|
+
+=========================
+|build-status| |Autotest-selenium-python|
 
 ---
 
